@@ -9,12 +9,12 @@ const skills = [
 	{
 		skill: 'Javascript',
 		level: 'advanced',
-		color: 'blue',
+		color: 'red',
 	},
 	{
 		skill: 'Web design',
 		level: 'advanced',
-		color: 'blue',
+		color: 'green',
 	},
 	{
 		skill: 'Git and Github',
@@ -24,12 +24,12 @@ const skills = [
 	{
 		skill: 'React',
 		level: 'advanced',
-		color: 'blue',
+		color: 'orange',
 	},
 	{
 		skill: 'Svelte',
 		level: 'beginner',
-		color: 'blue',
+		color: 'pink',
 	},
 ];
 
@@ -40,8 +40,8 @@ function App() {
 		<div className="card">
 			<Avatar imgLink="GutsBerserk.png" />
 			<div className="data">
-				<Intro name="Michael" intro={intro} />
-				<SkillList />
+				<Intro name="Michael Chen" intro={intro} />
+				<SkillList skills={skills} />
 			</div>
 		</div>
 	);
@@ -60,21 +60,28 @@ function Intro(props) {
 	);
 }
 
-function SkillList(props) {
+function SkillList({ skills }) {
 	return (
 		<div className="skill-list">
-			<Skill color="red" skill="HTML" emoji="&#128513;" />
-			<Skill color="red" skill="HTML" emoji="&#128513;" />
-			<Skill color="red" skill="HTML" emoji="&#128513;" />
-			<Skill color="red" skill="HTML" emoji="&#128513;" />
+			{skills.map((skill) => (
+				<Skill color={skill.color} skill={skill.skill} emoji={skill.level} />
+			))}
 		</div>
 	);
 }
 
-function Skill(props) {
+function Skill({ color, skill, emoji }) {
+	let icon = '';
+	if (emoji === 'beginner') {
+		icon = '😓';
+	} else if (emoji === 'intermediate') {
+		icon = '😊';
+	} else {
+		icon = '😈';
+	}
 	return (
-		<div className="skill" style={{ backgroundColor: props.color }}>
-			{props.skill} {props.emoji}
+		<div className="skill" style={{ backgroundColor: color }}>
+			{skill} {icon}
 		</div>
 	);
 }
