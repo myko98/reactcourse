@@ -1,0 +1,156 @@
+import { useState } from 'react'
+const initialFriends = [
+	{
+		id: 118836,
+		name: "Clark",
+		image: "https://i.pravatar.cc/48?u=118836",
+		balance: -7,
+	},
+	{
+		id: 933372,
+		name: "Sarah",
+		image: "https://i.pravatar.cc/48?u=933372",
+		balance: 20,
+	},
+	{
+		id: 499476,
+		name: "Anthony",
+		image: "https://i.pravatar.cc/48?u=499476",
+		balance: 0,
+	},
+];
+
+function FriendsList({ friends, onSelectFriend, selectedFriend }) {
+
+	return (
+		<ul>{friends.map((friend) =>
+			<Friend
+				friend={friend}
+				key={friend.id}
+				onSelectFriend={onSelectFriend}
+				selectedFriend={selectedFriend}
+			/>)}
+		</ul>
+	)
+}
+
+function Friend({ friend, onSelectFriend, selectedFriend }) {
+	let color = (friend.balance == 0) ? "" : (friend.balance < 0) ? "red" : "green"
+	let message = (friend.balance == 0) ? `You and ${friend.name} are even` :
+		(friend.balance < 0) ? `You owe ${friend.name} ${friend.balance * -1}` : `${friend.name} owes you ${friend.balance}`
+
+
+	const isSelected = selectedFriend?.id === friend.id
+
+
+	return (
+		<li className={isSelected ? "selected" : ""}>
+			<img src={friend.image} alt={friend.name} />
+			<h3>{friend.name}</h3>
+			<p className={color}>{message}</p>
+			<Button onClick={() => onSelectFriend(friend)}>{isSelected ? "Close" : "Select"} </Button>
+		</li>
+	)
+}
+
+
+
+function FormAddFriend({ onAddFriend }) {
+
+	const [friendName, setFriendName] = useState("")
+	const [url, setUrl] = useState("")
+
+	const id = crypto.randomUUID
+
+	function handleSubmit(e) {
+		e.preventDefault();
+
+		// return nothing if name or url are empty
+		if (!friendName || !url) return;
+
+		const newFriend = {
+			id,
+			name: friendName,
+			image: `https://i.pravatar.cc/48?${url}`,
+			balance: 0
+		}
+
+		onAddFriend(newFriend)
+		setFriendName("")
+		setUrl("")
+	}
+
+	return (
+		<form className="form-add-friend" onSubmit={handleSubmit}>
+			<label> Friend Name</label>
+			<input value={friendName} onChange={(e) => setFriendName(e.target.value)} type='text' />
+			<label> Image URL</label>
+			<input value={url} onChange={(e) => setUrl(e.target.value)} text="text" />
+			<Button>Add</Button>
+		</form>
+	)
+}
+
+function FormSplitBill({ selectedFriend }) {
+	const [bill, setBill] = useState("")
+	return (
+		<form className="form-split-bill">
+			<h2>Split a bill with {selectedFriend.name}</h2>
+
+			<label> Bill Value</label>
+			<input text="text" />
+
+			<label> Your Expense</label>
+			<input text="text" />
+
+			<label> {selectedFriend.name}'s expense</label>
+			<input disabled text="text" />
+
+			<label> Who's paying the bill?</label>
+			<select>
+				<option value="user">You</option>
+				<option value="friend">friend</option>
+			</select>
+			<Button>Split bill</Button>
+
+		</form>
+	)
+}
+
+function Button({ children, onClick }) {
+	return <button onClick={onClick} className="button" > {children}</button >
+}
+
+function App() {
+	const [showAddFriend, setShowAddFriend] = useState(false)
+	const [friends, setFriends] = useState(initialFriends)
+	const [selectedFriend, setSelectedFriend] = useState(null)
+
+	// make handler function to be passed as onClick function to create cleaner code!
+	function handleShowAddFriend() {
+		setShowAddFriend((show) => !show)
+	}
+
+	function handleAddFriend(friend) {
+		setFriends((friends) => [...friends, friend])
+		setShowAddFriend(false)
+	}
+
+	function handleSelectFriend(friend) {
+		setSelectedFriend((curr) => curr?.id === friend.id ? null : friend)
+		setShowAddFriend(false)
+	}
+
+	return (
+		<div className="app">
+			<div className="sidebar">
+				<FriendsList friends={friends} onSelectFriend={handleSelectFriend} selectedFriend={selectedFriend} />
+				{showAddFriend && <FormAddFriend onAddFriend={handleAddFriend} />}
+				<Button onClick={handleShowAddFriend}>{showAddFriend ? "Close" : "Add Friend"}</Button>
+			</div>
+			{selectedFriend && <FormSplitBill selectedFriend={selectedFriend} />}
+		</div>
+	)
+}
+
+export default App;
